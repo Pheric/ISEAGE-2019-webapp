@@ -1,7 +1,7 @@
 var schedule = require('node-schedule');
 var as = require("./aerospike");
 
-module.exports.job = schedule.scheduleJob('31 * * * *', function () {
+module.exports.job = schedule.scheduleJob('* * * * *', function () {
     as.syn();  // No relation to Mr. Gates
 });
 
