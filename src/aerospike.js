@@ -2,7 +2,7 @@ const Aerospike = require('aerospike');
 const uuid = require('uuid/v4');
 let randomItem = require('random-item');
 let request = require('request');
-let sessions = require("./sessions");
+let session_utils = require("./session_utils");
 
 const config = as_settings;
 let policies = {
@@ -49,7 +49,7 @@ function getUpstream(callback) {
     });
     stream.on('data', record => {
         request.get({
-            uri: '/transfer.cgi',
+            uri: '/read.cgi',
             baseUrl: settings.P9_2_json.ip,
             useQuerystring: true,
             qs: {
@@ -85,7 +85,7 @@ function doTransfers() {
     stream.on('data', record => {
         let bins = record.bins;
         request.post({
-            uri: '/transfer.cgi',
+            uri: '/transaction.cgi',
             baseUrl: settings.P9_2_json.ip,
             useQuerystring: true,
             qs: {
@@ -172,7 +172,7 @@ function addUser(uname, pass, callback) {
     let key = new Aerospike.Key("minimoira", "users", uname);
     client.put(key, {
         uname: uname,
-        pass: sessions.hashPassword(pass)
+        pass: session_utils.hashPassword(pass)
     }).then(record => {
         callback(record)
     }).catch(error => logger.error(error))
@@ -185,7 +185,7 @@ function getUser(uname, callback) {
         if (error) {
             switch (error.code) {
                 case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
-                    addUser(uname, sessions.hashPassword("cdc"), function () {
+                    addUser(uname, session_utils.hashPassword("cdc"), function () {
                         getUser(uname, function (res) {
                             callback(res)
                         })
