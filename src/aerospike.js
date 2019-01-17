@@ -2,6 +2,7 @@ const Aerospike = require('aerospike');
 const uuid = require('uuid/v4');
 let randomItem = require('random-item');
 let request = require('request');
+let sessions = require("./sessions");
 
 const config = as_settings;
 let policies = {
@@ -26,7 +27,7 @@ module.exports.checkconn = function checkConnection() {
 
 module.exports.syn = function () {
     try {
-        logger.debug("HAIL TO THE KING " + new Date().toISOString());
+        logger.debug("Running database sync " + new Date().toISOString());
         getUpstream(function () {
             doTransfers();
             doAdds();
@@ -78,7 +79,7 @@ function doTransfers() {
     });
     stream.on('end', () => {
         client.truncate('minimoira', 'transfers', function () {
-            logger.info(randomItem(references));
+            logger.info("doTransfers(): truncating transfers");
         })
     });
     stream.on('data', record => {
@@ -105,7 +106,7 @@ function doAdds() {
     });
     stream.on('end', () => {
         client.truncate('minimoira', 'adds', function () {
-            logger.info(randomItem(references));
+            logger.info("doAdds(): truncating adds");
         })
     });
     stream.on('data', record => {
@@ -171,7 +172,7 @@ function addUser(uname, pass, callback) {
     let key = new Aerospike.Key("minimoira", "users", uname);
     client.put(key, {
         uname: uname,
-        pass: pass
+        pass: sessions.hashPassword(pass)
     }).then(record => {
         callback(record)
     }).catch(error => logger.error(error))
@@ -184,7 +185,7 @@ function getUser(uname, callback) {
         if (error) {
             switch (error.code) {
                 case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
-                    addUser(uname, "cdc", function () {
+                    addUser(uname, sessions.hashPassword("cdc"), function () {
                         getUser(uname, function (res) {
                             callback(res)
                         })
@@ -202,6 +203,7 @@ function getUser(uname, callback) {
 module.exports.getUser = getUser;
 
 
+// The parameters are just defaults I think
 module.exports.newAccount = function (acount_number = 0, owner = "TheToddLuci0", bal = 666.0, pin = 1234) {
     this.checkconn();
     let key = new Aerospike.Key("minimoira", "accounts", acount_number);
@@ -213,7 +215,7 @@ module.exports.newAccount = function (acount_number = 0, owner = "TheToddLuci0",
         account_number: acount_number,
         owner: owner,
         amount: new Aerospike.Double(bal)
-    }, policy)
+    }, policy);
     request.post({
         baseUrl: settings.P9_2_json.ip + settings.P9_2_json.port.toString(),
         uri: '/acct.cgi',
