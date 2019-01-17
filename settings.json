@@ -1,11 +1,11 @@
 {
-  "team": 40,
+  "team": 3,
   "strings": {
     "bank_name": "Communist Depository Corpus",
-    "tag_line": "In Soviet Russia, Bank deposit <em>you</em>l"
+    "tag_line": "In Soviet Russia, Bank deposit <em>you</em>!"
   },
-  "title": "I don't know how to change settings",
-  "flag": "FLAG_DATA_HERE",
+  "title": "Communist Depository Corpus",
+  "flag": "Hm72ppz4wC3uT8wvuEXKQSHFNbnunKBEei9D6mX3hNnY1nuBcR",
   "P9_2_json": {
     "ip": "http://199.100.112.42",
     "port": 8080
