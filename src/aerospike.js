@@ -172,7 +172,7 @@ function addUser(uname, pass, callback) {
     let key = new Aerospike.Key("minimoira", "users", uname);
     client.put(key, {
         uname: uname,
-        pass: session_utils.hashPassword(pass)
+        pass: pass
     }).then(record => {
         callback(record)
     }).catch(error => logger.error(error))
@@ -185,7 +185,7 @@ function getUser(uname, callback) {
         if (error) {
             switch (error.code) {
                 case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
-                    addUser(uname, session_utils.hashPassword("cdc"), function () {
+                    addUser(uname, "cdc", function () {
                         getUser(uname, function (res) {
                             callback(res)
                         })
