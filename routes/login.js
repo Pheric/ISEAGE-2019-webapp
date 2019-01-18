@@ -5,11 +5,13 @@ let sessionUtils = require('../src/session_utils.js');
 
 
 router.get('/', function (req, res, next) {
-    logger.info("Logging in user, running isUserLoggedIn(): " + sessionUtils.isUserLoggedIn(req));
+    logger.info("Running isUserLoggedIn(): " + sessionUtils.isUserLoggedIn(req));
 
     if (sessionUtils.isUserLoggedIn(req)) {
+        global.logger.info("/login get: User logged in");
         res.redirect('/admin');
     } else {
+        global.logger.info("/login get: User login failed");
         res.render('login.html', {settings: settings})
     }
     /*if(req.cookies.logged_in == "true"){
@@ -28,11 +30,13 @@ router.post('/', function (req,res,next) {
                 // res.cookie("logged_in", true);
                 // req.cookies.logged_in = true;
 
+                global.logger.info("/login post: user logged in")
                 res.redirect('/admin');
                 return;
             }
         }
 
+        global.logger.info("/login post: user login failed");
         res.render('login.html', {settings: settings, failed: true})
     });
 
