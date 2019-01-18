@@ -5,14 +5,21 @@ let hm = require("hashmap");
 let sessionMap = new hm.HashMap();
 
 module.exports = {
-    handleLoggedIn(req) {
+    isUserLoggedIn(req) {
         logger.info("handleLoggedIn() called with parameter " + req);
+
+        let username = req.cookies.username, secret = req.cookies.secret;
+        return username && secret && isValidInSessionMap(username, secret)
     },
-    hashPassword(password) {
+    hashPassword(password, salt = "") {
         // TODO
-        argon.hash(password).then(hash => {
-            logger.info("Calling hashPassword(" + password + "): " + hash);
+        argon.hash(password, salt).then(hash => {
+            logger.info("Calling hashPassword(" + password + "): " + hash + "; TYPE: " + typeof hash);
         });
         return password;
     }
 };
+
+function isValidInSessionMap(username, secret) {
+    return sessionMap.has(username) && sessionMap.get(username) === secret;
+}
