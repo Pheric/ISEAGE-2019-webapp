@@ -11,7 +11,7 @@ module.exports = {
     hashPassword(password) {
         // TODO
         argon.hash(password).then(hash => {
-            logger.info("Calling hashPassword(" + password + "): " + hashed);
+            logger.info("Calling hashPassword(" + password + "): " + hash);
         });
         return password;
     }
