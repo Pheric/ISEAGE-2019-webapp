@@ -2,8 +2,6 @@ let express = require('express');
 let router = express.Router();
 let as = require('../src/aerospike');
 
-
-
 router.get('/num/:account_number', function (req, res, next) {
     as.getAccount(req.params.account_number, function (err, rec) {
         if (err){
