@@ -5,7 +5,7 @@ let sessionUtils = require('../src/session_utils.js');
 
 
 router.get('/', function (req, res, next) {
-    logger.info("Logging in user, running isUserLoggedIn(): ", sessionUtils.isUserLoggedIn(req));
+    logger.info("Logging in user, running isUserLoggedIn(): " + sessionUtils.isUserLoggedIn(req));
 
     if(req.cookies.logged_in == "true"){
         res.redirect('/admin')

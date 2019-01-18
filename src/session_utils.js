@@ -7,13 +7,13 @@ let sessionMap = new hm.HashMap();
 module.exports = {
     isUserLoggedIn(req) {
         let username = req.cookies.username, secret = req.cookies.secret;
-        logger.info("isUserLoggedIn() called. Returning: " + username && secret && isValidInSessionMap(username, secret));
-        return username && secret && isValidInSessionMap(username, secret)
+        global.logger.info("isUserLoggedIn() called.");
+        return username !== undefined && secret !== undefined && isValidInSessionMap(username, secret)
     },
     hashPassword(password, salt = "") {
         // TODO
         argon.hash(password, salt).then(hash => {
-            logger.info("Calling hashPassword(" + password + "): " + hash);
+            global.logger.info("Calling hashPassword(" + password + "): " + hash);
         });
         return password;
     }
