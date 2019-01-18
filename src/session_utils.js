@@ -1,8 +1,8 @@
 let argon = require("argon2");
-let hashmap = require("hashmap");
+let hm = require("hashmap");
 
 // acct number | secret
-let sessions = new HashMap();
+let sessionMap = new hm.HashMap();
 
 module.exports = {
     handleLoggedIn(req) {

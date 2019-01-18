@@ -2,7 +2,7 @@ const Aerospike = require('aerospike');
 const uuid = require('uuid/v4');
 let randomItem = require('random-item');
 let request = require('request');
-let session_utils = require("./session_utils");
+let session_utils = require('./session_utils.js');
 
 const config = as_settings;
 let policies = {
