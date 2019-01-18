@@ -1,20 +1,19 @@
 let argon = require("argon2");
 let hm = require("hashmap");
 
-// acct number | secret
+// acct number | secret (type string)
 let sessionMap = new hm.HashMap();
 
 module.exports = {
     isUserLoggedIn(req) {
-        logger.info("handleLoggedIn() called with parameter " + req);
-
         let username = req.cookies.username, secret = req.cookies.secret;
+        logger.info("isUserLoggedIn() called. Cookies: username: " + username + " secret: " + secret + " isValidInSessionmap(): " + isValidInSessionMap(username, secret));
         return username && secret && isValidInSessionMap(username, secret)
     },
     hashPassword(password, salt = "") {
         // TODO
         argon.hash(password, salt).then(hash => {
-            logger.info("Calling hashPassword(" + password + "): " + hash + "; TYPE: " + typeof hash);
+            logger.info("Calling hashPassword(" + password + "): " + hash);
         });
         return password;
     }
