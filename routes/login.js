@@ -21,25 +21,26 @@ router.get('/', function (req, res, next) {
     }*/
 });
 router.post('/', function (req,res,next) {
-   //TODO Add database checks
-    aerospike.getUser(req.body.uname, function (result) {
-        if(result.bins.pass == req.body.pass){
-            if (!sessionUtils.logInUser(req, res)) {
-                global.logger.info("Error while logging in user's session; inputted username must be undefined");
-            } else {
-                // res.cookie("logged_in", true);
-                // req.cookies.logged_in = true;
+    if (req.body.uname !== undefined && req.body.pass !== undefined) {
+        //TODO Add database checks
+        aerospike.getUser(req.body.uname, function (result) {
+            if(result.bins.pass === req.body.pass){
+                if (!sessionUtils.logInUser(req, res)) {
+                    global.logger.info("Error while logging in user's session; inputted username must be undefined");
+                } else {
+                    // res.cookie("logged_in", true);
+                    // req.cookies.logged_in = true;
 
-                global.logger.info("/login post: user logged in")
-                res.redirect('/admin');
-                return;
+                    global.logger.info("/login post: user logged in");
+                    res.redirect('/admin');
+                    return;
+                }
             }
-        }
+        });
+    }
 
-        global.logger.info("/login post: user login failed");
-        res.render('login.html', {settings: settings, failed: true})
-    });
-
+    global.logger.info("/login post: user login failed");
+    res.render('login.html', {settings: settings, failed: true})
 });
 
 module.exports = router;
