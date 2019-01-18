@@ -7,7 +7,7 @@ let sessionMap = new hm.HashMap();
 module.exports = {
     isUserLoggedIn(req) {
         let username = req.cookies.username, secret = req.cookies.secret;
-        logger.info("isUserLoggedIn() called. Cookies: username: " + username + " secret: " + secret + " isValidInSessionmap(): " + isValidInSessionMap(username, secret));
+        logger.info("isUserLoggedIn() called. Returning: " + username && secret && isValidInSessionMap(username, secret));
         return username && secret && isValidInSessionMap(username, secret)
     },
     hashPassword(password, salt = "") {
