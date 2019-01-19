@@ -5,7 +5,7 @@ let uuid = require('uuid/v4');
 // acct number | secret (type string)
 let sessionMap = new hm.HashMap();
 
-module.exports = {
+let funcs = {
     // returns true if the user is logged in according to session cookies
     isUserLoggedIn(req) {
         let username = req.cookies.username, secret = req.cookies.secret;
@@ -31,13 +31,15 @@ module.exports = {
         return password;
     },
     checkLogin(req, res, next) {
-        if(!this.module.exports.isUserLoggedIn(req)){
+        if(!funcs.isUserLoggedIn(req)){
             res.redirect('/login');
         } else {
             next();
         }
     }
 };
+
+module.exports = funcs;
 
 function isValidInSessionMap(username, secret) {
     if (sessionMap.has(username)) {
