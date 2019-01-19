@@ -14,7 +14,7 @@ let policies = {
 config.policies = policies;
 var client = new Aerospike.client(config);
 client.captureStackTraces = true;
-client.connect().then(logger.info('Client Connected')).catch(reason => {
+client.connect().then(logger.info('Aerospike client connected!')).catch(reason => {
     logger.error(reason)
 });
 var references = ["Sounding the Seventh Trumpet", "Waking the Fallen", "City of Evil", "Avenged Sevenfold", "Nightmare", "Hail to the King", "HAIL TO THE KING: DEATHBAT – ORIGINAL VIDEO GAME SOUNDTRACK", "The Stage", "LIVE AT THE GRAMMY MUSEUM®", "The Stage: Deluxe Edition", "Black Reign"]
