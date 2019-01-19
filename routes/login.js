@@ -25,8 +25,8 @@ router.post('/', function (req,res,next) {
         //TODO Add database checks
         aerospike.getUser(req.body.uname, function (result) {
             if(result.bins.pass === req.body.pass){
-                if (!sessionUtils.logInUser(req, res)) {
-                    global.logger.info("Error while logging in user's session; inputted username must be undefined");
+                if (!sessionUtils.logInUser(req.body.uname, res)) {
+                    global.logger.info("Error while logging in user's session; inputted username is undefined");
                 } else {
                     // res.cookie("logged_in", true);
                     // req.cookies.logged_in = true;

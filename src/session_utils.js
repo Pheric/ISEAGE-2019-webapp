@@ -11,8 +11,7 @@ module.exports = {
         return username !== undefined && secret !== undefined && isValidInSessionMap(username, secret)
     },
     // sets cookies and adds user to the session map
-    logInUser(req, res) {
-        let username = req.cookies.username;
+    logInUser(username, res) {
         if (username === undefined) return false;
 
         argon2.generateSalt().then(salt => {
