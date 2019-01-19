@@ -36,11 +36,12 @@ router.post('/', function (req,res,next) {
                     return;
                 }
             }
+
+            // Keep here, the db call is async
+            global.logger.info("/login post: user login failed");
+            res.render('login.html', {settings: settings, failed: true})
         });
     }
-
-    global.logger.info("/login post: user login failed");
-    res.render('login.html', {settings: settings, failed: true})
 });
 
 module.exports = router;
