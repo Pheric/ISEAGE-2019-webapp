@@ -44,7 +44,7 @@ app.use(cookieParser());
 let init = require("./src/init_session");
 app.use(init);
 
-let sessionUtils = require('../src/session_utils.js');
+let sessionUtils = require('./session_utils.js');
 
 app.use(express.static(path.join(__dirname, '/public')));
 var indexRouter = require('./routes/index');
