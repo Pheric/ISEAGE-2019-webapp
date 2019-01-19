@@ -12,15 +12,11 @@ let funcs = {
     },
     // sets cookies and adds user to the session map
     logInUser(username, res) {
-        global.logger.info(`logInUser(${username})-> undefined: ${username === undefined}`);
-        if (username === undefined) return false;
-
-        global.logger.info(`Setting session for user ${username}`);
+        global.logger.info(`logInUser(): Setting session for user ${username}`);
         let salt = uuid();
         sessionMap.set(username, salt);
+        res.cookie("username", username, { maxAge: 1000 * 60 * 20 /* 20 minutes */});
         res.cookie("secret", salt, { maxAge: 1000 * 60 * 10 /* 10 minutes */, httpOnly: true });
-
-        return true;
     },
     hashPassword(password, salt = "") {
         // TODO
