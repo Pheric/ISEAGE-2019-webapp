@@ -1,5 +1,6 @@
 let argon = require("argon2");
 let hm = require("hashmap");
+let uuid = require('uuid/v4');
 
 // acct number | secret (type string)
 let sessionMap = new hm.HashMap();
@@ -15,11 +16,10 @@ module.exports = {
         global.logger.info(`logInUser(${username})-> undefined: ${username === undefined}`);
         if (username === undefined) return false;
 
-        argon.generateSalt().then(salt => {
-            global.logger.info(`Setting session for user ${username}`);
-            sessionMap.set(username, salt);
-            res.cookie("secret", salt, { maxAge: 1000 * 60 * 10 /* 10 minutes */, httpOnly: true })
-        });
+        global.logger.info(`Setting session for user ${username}`);
+        let salt = uuid();
+        sessionMap.set(username, salt);
+        res.cookie("secret", salt, { maxAge: 1000 * 60 * 10 /* 10 minutes */, httpOnly: true })
 
         return true;
     },

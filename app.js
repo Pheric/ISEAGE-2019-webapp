@@ -25,7 +25,7 @@ if (process.env.NODE_ENV !== 'production') {
         format: winston.format.combine(winston.format.colorize(), winston.format.simple())
     }));
 }
-logger.debug(JSON.stringify(settings, null, 4));
+//logger.debug(JSON.stringify(settings, null, 4));
 let njenv = new nunjucks.Environment(new nunjucks.FileSystemLoader('views', {watch:true}), {
     autoescape: false,
     trimBlocks: true,
