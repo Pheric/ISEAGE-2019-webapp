@@ -4,14 +4,14 @@
 {% if results %}
 <ul>
     {% for result in results %}
-    <li><a href="{{result.link}}">{{result.text}}</a></li>
+    <li><a href="{{result.link | escape}}">{{result.text | escape}}</a></li>
     {% endfor %}
 </ul>
 {% elif search %}
 <script>console.log(JSON.stringify(search, null, 4))</script>
-<h3>{{search.search}}</h3>
-<p style="color: #1c7430">{{search.result}}</p>
-<p style="color: #dc3545">{{search.error}}</p>
+<h3>{{search.search | escape}}</h3>
+<p style="color: #1c7430">{{search.result | escape}}</p>
+<p style="color: #dc3545">{{search.error | escape}}</p>
 {% else %}
     <p>Nothing. Perhaps you should ask a party officer, da?</p>
 {% endif %}
