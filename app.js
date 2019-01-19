@@ -33,7 +33,7 @@ let njenv = new nunjucks.Environment(new nunjucks.FileSystemLoader('views', {wat
 });
 njenv.addGlobal("settings", settings)
     .express(app);
-logger.info(JSON.stringify(njenv.getGlobal("settings")));
+//logger.info(JSON.stringify(njenv.getGlobal("settings")));
 
 var logStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), {flags: 'a'}); //TODO this needs pointed to /var/log
 app.use(app_logger('common', {stream: logStream}));
