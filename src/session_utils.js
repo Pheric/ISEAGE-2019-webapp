@@ -31,12 +31,11 @@ module.exports = {
         return password;
     },
     checkLogin(req, res, next) {
-        if(!isUserLoggedIn(req)){
+        if(!this.module.exports.isUserLoggedIn(req)){
             res.redirect('/login');
-            return;
+        } else {
+            next();
         }
-
-        next();
     }
 };
 
