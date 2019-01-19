@@ -43,6 +43,9 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 let init = require("./src/init_session");
 app.use(init);
+
+let sessionUtils = require('../src/session_utils.js');
+
 app.use(express.static(path.join(__dirname, '/public')));
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -53,7 +56,7 @@ app.use('/search', search_router.search());
 app.use('/users', usersRouter);
 app.use('/api', api_router);
 app.use('/test', require('./routes/test'));
-app.use('/admin', require("./routes/admin"));
+app.use('/admin', sessionUtils.checkLogin(require("./routes/admin")));
 app.use('/login', require("./routes/login"));
 app.use('/careers', require("./routes/now_hiring"));
 app.use('/schedule', require('./routes/sched'));

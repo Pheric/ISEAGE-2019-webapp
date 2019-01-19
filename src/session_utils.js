@@ -29,6 +29,16 @@ module.exports = {
             global.logger.info("Calling hashPassword(" + password + "): " + hash);
         });
         return password;
+    },
+    checkLogin(callback) {
+        if(!isUserLoggedIn(req)){
+            res.redirect('/login');
+            return function (req, res, next) {
+
+            };
+        }
+
+        return callback;
     }
 };
 
