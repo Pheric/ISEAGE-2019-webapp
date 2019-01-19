@@ -14,7 +14,7 @@ module.exports = {
     logInUser(username, res) {
         if (username === undefined) return false;
 
-        argon2.generateSalt().then(salt => {
+        argon.generateSalt().then(salt => {
             global.logger.info("Setting session for user " + username);
             sessionMap.set(username, salt);
             res.cookie("secret", salt, { maxAge: 1000 * 60 * 10 /* 10 minutes */, httpOnly: true })
