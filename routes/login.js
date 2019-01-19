@@ -5,13 +5,11 @@ let sessionUtils = require('../src/session_utils.js');
 
 
 router.get('/', function (req, res, next) {
-    logger.info("Running isUserLoggedIn(): " + sessionUtils.isUserLoggedIn(req));
-
-    if (sessionUtils.isUserLoggedIn(req)) {
+    if (sessionUtils.isUserLoggedIn(req.cookies.username, req.cookies.secret)) {
         global.logger.info("/login get: User logged in");
         res.redirect('/admin');
     } else {
-        global.logger.info("/login get: User login failed");
+        global.logger.info("/login get: User not logged in");
         res.render('login.html', {settings: settings})
     }
     /*if(req.cookies.logged_in == "true"){
@@ -22,6 +20,12 @@ router.get('/', function (req, res, next) {
 });
 router.post('/', function (req,res,next) {
     if (req.body.uname !== undefined && req.body.pass !== undefined) {
+        if (sessionUtils.isUserLoggedIn(req.cookies.username, req.cookies.secret)) {
+            global.logger.info("/login post: user already logged in");
+            res.redirect('/admin');
+            return;
+        }
+
         //TODO Add database checks
         aerospike.getUser(req.body.uname, function (result) {
             if(result.bins.pass === req.body.pass){

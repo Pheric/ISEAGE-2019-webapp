@@ -7,8 +7,7 @@ let sessionMap = new hm.HashMap();
 
 let funcs = {
     // returns true if the user is logged in according to session cookies
-    isUserLoggedIn(req) {
-        let username = req.cookies.username, secret = req.cookies.secret;
+    isUserLoggedIn(username, secret) {
         return username !== undefined && secret !== undefined && isValidInSessionMap(username, secret)
     },
     // sets cookies and adds user to the session map
@@ -19,7 +18,7 @@ let funcs = {
         global.logger.info(`Setting session for user ${username}`);
         let salt = uuid();
         sessionMap.set(username, salt);
-        res.cookie("secret", salt, { maxAge: 1000 * 60 * 10 /* 10 minutes */, httpOnly: true })
+        res.cookie("secret", salt, { maxAge: 1000 * 60 * 10 /* 10 minutes */, httpOnly: true });
 
         return true;
     },
@@ -31,7 +30,7 @@ let funcs = {
         return password;
     },
     checkLogin(req, res, next) {
-        if(!funcs.isUserLoggedIn(req)){
+        if(!funcs.isUserLoggedIn(req.cookies.username, req.cookies.secret)){
             res.redirect('/login');
         } else {
             next();
