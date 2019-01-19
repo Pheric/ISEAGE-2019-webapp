@@ -30,15 +30,13 @@ module.exports = {
         });
         return password;
     },
-    checkLogin(callback) {
+    checkLogin(req, res, next) {
         if(!isUserLoggedIn(req)){
             res.redirect('/login');
-            return function (req, res, next) {
-
-            };
+            return;
         }
 
-        return callback;
+        next();
     }
 };
 
