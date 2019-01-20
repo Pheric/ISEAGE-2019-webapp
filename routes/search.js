@@ -3,56 +3,33 @@ var router = express.Router();
 var multer = require('multer');
 var unique = require('array-unique');
 var upload = multer();
-let helper = require('../src/helpers');
-let fs = require('fs');
-let cp = require('child_process');
 
 module.exports.search = function search() {
     router.post('/', upload.any(), function (req, res, next) {
-        if (!req.body.search_terms) {
-            throw {status: 200, message: "Boris can't search for nothing comrade"}
-        }
-        quick_search(req.body.Search, (results) => {
-            if (results) {
-                res.render('search.html', {settings: settings, results: results})
-            } else {
-                //Handle no quick result
-                helper.deep_search(req.body.Search, function (a, b) {
-                    res.render('search.html', {
-                        settings: settings,
-                        search: {search: req.params.search_term, error: b, result: a}
-                    })
-                })
-            }
-        })
+        searchReturn(req.body.search_terms);
     });
-    router.get('/:search_term/', function (req, res, next) {
-        if (!req.params.search_term) {
-            helper.make_pretty(req.body, function (resp) {
-                logger.error(resp)
-                throw {status: 200, message: "Boris can't search for nothing comrade"}
-            })
-        }
-        quick_search(req.params.search_term, (results) => {
-            if (results) {
-                res.render('search.html', {settings: settings, results: results})
-            } else {
-                //Handle no quick result
-                helper.deep_search(req.params.search_term, function (a, b) {
-                    // res.send({Search: req.params.search_term, a: a, b: b})
-                    res.render('search.html', {
-                        settings: settings,
-                        search: {search: req.params.search_term, error: b, result: a}
-                    })
-                })
-            }
-        })
+    router.get('/:url_search_term/', function (req, res, next) {
+        searchReturn(req.params.url_search_term, res);
     });
     router.get('/', function (req, res, next) {
         throw {status: 200, message: "Boris can't search for nothing comrade"}
     });
     return router;
 };
+
+function searchReturn(terms, res) {
+    if (!terms) {
+        throw {status: 200, message: "Boris can't search for nothing comrade"};
+    }
+
+    quick_search(terms, (results) => {
+        if (results) {
+            res.render('search.html', {settings: settings, results: results});
+        } else {
+            throw {status: 200, message: "Boris can't search for nothing comrade"};
+        }
+    })
+}
 
 function quick_search(query, callback) {
     var results = [];
