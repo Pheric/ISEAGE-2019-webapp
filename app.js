@@ -63,6 +63,7 @@ app.use('/schedule', require('./routes/sched'));
 app.use('/account', require('./routes/account'));
 app.use('/about', require('./routes/about'));
 app.use('/settings', require('./routes/settings'));
+app.use('/logout', require('./routes/logout.js'));
 app.use(function (req, res, next) {
     next(createError(404));
 });
@@ -75,14 +76,10 @@ logger.error(JSON.stringify({
     message: err.message,
     stack: err.stack
 }, null, 4))
-    res.status(err.status || 450);
+    res.status(err.status || 500);
     res.render('error.html', {
         settings: settings,
-        error: JSON.stringify({
-            level:err.level,
-            message: err.message,
-            stack: err.stack
-        }, null, 4).replace(/\\n/g, '\<br \/\>')
+        error: "An error occurred. try again later."
     });
 });
 module.exports = app;

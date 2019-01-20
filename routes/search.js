@@ -9,11 +9,8 @@ let cp = require('child_process');
 
 module.exports.search = function search() {
     router.post('/', upload.any(), function (req, res, next) {
-        if (!req.body.Search) {
-            helper.make_pretty(req.body, function (resp) {
-                logger.error(resp);
-                throw {status: 400, message: "Boris can't search for nothing comrade"}
-            })
+        if (!req.body.search_terms) {
+            throw {status: 200, message: "Boris can't search for nothing comrade"}
         }
         quick_search(req.body.Search, (results) => {
             if (results) {
@@ -33,7 +30,7 @@ module.exports.search = function search() {
         if (!req.params.search_term) {
             helper.make_pretty(req.body, function (resp) {
                 logger.error(resp)
-                throw {status: 451, message: "Boris can't search for nothing comrade"}
+                throw {status: 200, message: "Boris can't search for nothing comrade"}
             })
         }
         quick_search(req.params.search_term, (results) => {
@@ -52,7 +49,7 @@ module.exports.search = function search() {
         })
     });
     router.get('/', function (req, res, next) {
-        throw {status: 400, message: "Boris can't search for nothing comrade"}
+        throw {status: 200, message: "Boris can't search for nothing comrade"}
     });
     return router;
 };

@@ -8,7 +8,6 @@
     {% endfor %}
 </ul>
 {% elif search %}
-<script>console.log(JSON.stringify(search, null, 4))</script>
 <h3>{{search.search | escape}}</h3>
 <p style="color: #1c7430">{{search.result | escape}}</p>
 <p style="color: #dc3545">{{search.error | escape}}</p>

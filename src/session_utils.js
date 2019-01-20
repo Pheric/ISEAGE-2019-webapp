@@ -31,6 +31,10 @@ let funcs = {
         } else {
             next();
         }
+    },
+    logoutUser(res) {
+        res.cookie("username", "", {maxAge: 1});
+        res.cookie("secret", "", {maxAge: 1});
     }
 };
 

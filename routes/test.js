@@ -1,10 +1,11 @@
-let express = require('express')
-let router = express.Router()
-let as = require('../src/aerospike')
+let express = require('express');
+let router = express.Router();
+let as = require('../src/aerospike');
 
 
 router.get('/aerospike', function (req, res, next) {
-    as.test();
+    // No database tests for you, comrades
+    //as.test();
     res.redirect('/')
 });
 
