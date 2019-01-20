@@ -79,7 +79,7 @@ logger.error(JSON.stringify({
     res.status(err.status || 500);
     res.render('error.html', {
         settings: settings,
-        error: "An error occurred. try again later."
+        error: "An error occurred. Try again later."
     });
 });
 module.exports = app;

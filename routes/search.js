@@ -1,12 +1,13 @@
 var express = require('express');
 var router = express.Router();
-var multer = require('multer');
 var unique = require('array-unique');
-var upload = multer();
 
 module.exports.search = function search() {
-    router.post('/', upload.any(), function (req, res, next) {
-        searchReturn(req.body.search_terms);
+    router.post('/', function (req, res, next) {
+        searchReturn(req.body.search_terms, res);
+    });
+    router.get('/:url_search_term', function (req, res, next) {
+        searchReturn(req.params.url_search_term, res);
     });
     router.get('/:url_search_term/', function (req, res, next) {
         searchReturn(req.params.url_search_term, res);
@@ -23,11 +24,7 @@ function searchReturn(terms, res) {
     }
 
     quick_search(terms, (results) => {
-        if (results) {
-            res.render('search.html', {settings: settings, results: results});
-        } else {
-            throw {status: 200, message: "Boris can't search for nothing comrade"};
-        }
+        res.render('search.html', {settings: settings, results: results});
     })
 }
 
