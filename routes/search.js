@@ -11,8 +11,8 @@ module.exports.search = function search() {
     router.post('/', upload.any(), function (req, res, next) {
         if (!req.body.Search) {
             helper.make_pretty(req.body, function (resp) {
-                logger.error(resp)
-                throw {status: 451, message: "Boris can't search for nothing comrade"}
+                logger.error(resp);
+                throw {status: 400, message: "Boris can't search for nothing comrade"}
             })
         }
         quick_search(req.body.Search, (results) => {
@@ -36,7 +36,7 @@ module.exports.search = function search() {
                 throw {status: 451, message: "Boris can't search for nothing comrade"}
             })
         }
-        quick_search(req.params.search_tearm, (results) => {
+        quick_search(req.params.search_term, (results) => {
             if (results) {
                 res.render('search.html', {settings: settings, results: results})
             } else {
@@ -52,7 +52,7 @@ module.exports.search = function search() {
         })
     });
     router.get('/', function (req, res, next) {
-        throw {status: 451, message: "Boris can't search for nothing comrade"}
+        throw {status: 400, message: "Boris can't search for nothing comrade"}
     });
     return router;
 };
