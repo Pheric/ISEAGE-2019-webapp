@@ -6,6 +6,9 @@ module.exports.search = function search() {
     router.post('/', function (req, res, next) {
         searchReturn(req.body.search_terms, res);
     });
+    router.get('/', function (req, res, next) {
+        searchReturn(null, res);
+    });
     router.get('/:url_search_term', function (req, res, next) {
         searchReturn(req.params.url_search_term, res);
     });

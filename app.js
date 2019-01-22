@@ -41,6 +41,8 @@ app.use(app_logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
+let bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
 let init = require("./src/init_session");
 app.use(init);
 
