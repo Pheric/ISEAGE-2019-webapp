@@ -4,7 +4,7 @@ var unique = require('array-unique');
 
 module.exports.search = function search() {
     router.post('/', function (req, res, next) {
-        searchReturn(req.body.search_terms, res);
+        searchReturn(req.fields.search_terms, res);
     });
     router.get('/', function (req, res, next) {
         searchReturn(null, res);
