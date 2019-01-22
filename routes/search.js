@@ -2,21 +2,18 @@ var express = require('express');
 var router = express.Router();
 var unique = require('array-unique');
 
-module.exports.search = function search() {
-    router.post('/', function (req, res, next) {
-        searchReturn(req.body.search_terms, res);
-    });
-    router.get('/:url_search_term', function (req, res, next) {
-        searchReturn(req.params.url_search_term, res);
-    });
-    router.get('/:url_search_term/', function (req, res, next) {
-        searchReturn(req.params.url_search_term, res);
-    });
-    router.get('/', function (req, res, next) {
-        throw {status: 200, message: "Boris can't search for nothing comrade"}
-    });
-    return router;
-};
+router.post('/', function (req, res, next) {
+    searchReturn(req.body.search_terms, res);
+});
+router.get('/:url_search_term', function (req, res, next) {
+    searchReturn(req.params.url_search_term, res);
+});
+router.get('/:url_search_term/', function (req, res, next) {
+    searchReturn(req.params.url_search_term, res);
+});
+router.get('/', function (req, res, next) {
+    throw {status: 200, message: "Boris can't search for nothing comrade"}
+});
 
 function searchReturn(terms, res) {
     if (!terms) {
@@ -73,3 +70,5 @@ function quick_search(query, callback) {
         callback(null)
     }
 }
+
+module.exports = router;
