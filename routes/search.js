@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
 var unique = require('array-unique');
+var upload = require('multer')();
 
 module.exports.search = function search() {
-    router.post('/', function (req, res, next) {
-        searchReturn(req.fields.search_terms, res);
+    router.post('/', upload.none(), function (req, res, next) {
+        searchReturn(req.body.search_terms, res);
     });
     router.get('/', function (req, res, next) {
         searchReturn(null, res);

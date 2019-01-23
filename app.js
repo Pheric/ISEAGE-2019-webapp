@@ -41,8 +41,6 @@ app.use(app_logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
-const formidable = require('express-formidable');
-app.use(formidable());
 let init = require("./src/init_session");
 app.use(init);
 
