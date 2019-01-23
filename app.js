@@ -64,22 +64,27 @@ app.use('/account', sessionUtils.checkLogin, require('./routes/account'));
 app.use('/about', require('./routes/about'));
 app.use('/settings', require('./routes/settings'));
 app.use('/logout', require('./routes/logout.js'));
+
+// 400 error
 app.use(function (req, res, next) {
-    next(createError(404));
+    res.status(404);
+    res.render('error.html', { settings: settings, error: "404, page not found" })
 });
 app.use(function (err, req, res, next) {
-    res.locals.message = err.message;
-    res.locals.error = err;
+    //res.locals.message = err.message;
+    //res.locals.error = err;
     logger.error(err);
-logger.error(JSON.stringify({
-    level:err.level,
-    message: err.message,
-    stack: err.stack
-}, null, 4))
+    logger.error(JSON.stringify({
+        level:err.level,
+        message: err.message,
+        stack: err.stack
+    }, null, 4));
+
     res.status(err.status || 500);
     res.render('error.html', {
         settings: settings,
         error: "An error occurred. Try again later."
     });
 });
+
 module.exports = app;
