@@ -20,6 +20,8 @@ router.post('/', function (req,res,next) {
         return;
     }
 
+    res.status(401);
+
     if (req.body.uname !== undefined && req.body.pass !== undefined) {
         //TODO Add database checks
         aerospike.getUser(req.body.uname, function (result) {

@@ -60,7 +60,7 @@ app.use('/admin', sessionUtils.checkLogin, require("./routes/admin"));
 app.use('/login', require("./routes/login"));
 app.use('/careers', require("./routes/now_hiring"));
 app.use('/schedule', require('./routes/sched'));
-app.use('/account', require('./routes/account'));
+app.use('/account', sessionUtils.checkLogin, require('./routes/account'));
 app.use('/about', require('./routes/about'));
 app.use('/settings', require('./routes/settings'));
 app.use('/logout', require('./routes/logout.js'));
