@@ -1,6 +1,5 @@
 const Aerospike = require('aerospike');
 const uuid = require('uuid/v4');
-let randomItem = require('random-item');
 let request = require('request');
 let session_utils = require('./session_utils.js');
 
@@ -17,7 +16,6 @@ client.captureStackTraces = true;
 client.connect().then(logger.info('Aerospike client connected!')).catch(reason => {
     logger.error(reason)
 });
-var references = ["Sounding the Seventh Trumpet", "Waking the Fallen", "City of Evil", "Avenged Sevenfold", "Nightmare", "Hail to the King", "HAIL TO THE KING: DEATHBAT – ORIGINAL VIDEO GAME SOUNDTRACK", "The Stage", "LIVE AT THE GRAMMY MUSEUM®", "The Stage: Deluxe Edition", "Black Reign"]
 
 module.exports.checkconn = function checkConnection() {
     if (!client.isConnected()) {
@@ -39,6 +37,7 @@ module.exports.syn = function () {
 
 
 function getUpstream(callback) {
+    this.checkconn();
     var scan = client.scan("minimoira", "accounts");
     var stream = scan.foreach();
     stream.on('error', error => {
@@ -72,6 +71,7 @@ function getUpstream(callback) {
 
 
 function doTransfers() {
+    this.checkconn();
     let scan = client.scan("minimoira", "transfers");
     var stream = scan.foreach();
     stream.on('error', error => {
@@ -99,6 +99,7 @@ function doTransfers() {
 
 
 function doAdds() {
+    this.checkconn();
     let scan = client.scan("minimoira", "adds");
     var stream = scan.foreach();
     stream.on('error', error => {
@@ -181,6 +182,7 @@ function addUser(uname, pass, callback) {
 module.exports.addUser = addUser;
 
 function getUser(uname, callback) {
+    this.checkconn();
     client.get(new Aerospike.Key("minimoira", "users", uname), function (error, record) {
         if (error) {
             switch (error.code) {
@@ -208,7 +210,7 @@ module.exports.newAccount = function (acount_number = 0, owner = "TheToddLuci0",
     this.checkconn();
     let key = new Aerospike.Key("minimoira", "accounts", acount_number);
     const policy = new Aerospike.WritePolicy({
-        exists: Aerospike.policy.exists.CREATE_OR_REPLACE
+        exists: Aerospike.policy.exists.CREATE_ONLY // Not sure about this
     });
     client.put(key, {
         pin: pin,
@@ -285,11 +287,11 @@ module.exports.truncate = function (req, res, next) {
 function add(data, callback) {
     // let key = new Aerospike.Key("minimoira", "accounts", data.account_number);
     let key = new Aerospike.Key("minimoira", "accounts", data.account_number.toString());
-    logger.debug(JSON.stringify(key, null, 4))
+    logger.debug(JSON.stringify(key, null, 4));
     logger.debug(JSON.stringify(data, null, 4));
     client.get(key).then(record => {
         client.put(key, {amount: parseFloat(record.bins.amount) + parseFloat(data.amount)}, function (error, key) {
-            callback(error, "It did _something_, idk if its the thing you asked for tho")
+            callback(error, "Error on aerospike.js>add()>client.get()>client.put()")
         })
     }).catch(e => {
         logger.error(JSON.stringify(e, null, 4))
@@ -316,7 +318,7 @@ function newAdd(data, callback1) {
 
 module.exports.getAccount = function (account_number = 0, callback) {
     let key = new Aerospike.Key("minimoira", "accounts", account_number);
-    logger.debug(JSON.stringify(key, null, 4))
+    logger.debug(JSON.stringify(key, null, 4));
     client.get(key, function (err, rec) {
         if (err) {
             logger.error(err);
