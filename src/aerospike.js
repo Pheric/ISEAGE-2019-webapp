@@ -175,7 +175,8 @@ function addUser(uname, pass, callback) {
     client.put(key, {
         uname: uname,
         pass: session_utils.hashPassword(pass, salt),
-        salt: salt
+        salt: salt,
+        admin: false
     }).then(record => {
         callback(record)
     }).catch(error => logger.error(error))

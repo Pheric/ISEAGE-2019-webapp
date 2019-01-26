@@ -31,7 +31,7 @@ router.post('/', function (req,res,next) {
                 return;
             }
             if(sessionUtils.checkLogin(req.body.uname, req.body.pass, result.bins.pass, result.bins.salt)){ // result.bins.pass === req.body.pass
-                sessionUtils.logInUser(req.body.uname, res);
+                sessionUtils.logInUser(req.body.uname, result.admin, res);
 
                 global.logger.info("/login post: user logged in, redir /admin");
                 res.redirect('/admin');
