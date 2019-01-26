@@ -25,7 +25,7 @@ router.post('/', function (req,res,next) {
     if (req.body.uname !== undefined && req.body.pass !== undefined) {
         //TODO Add database checks
         aerospike.getUser(req.body.uname, function (result) {
-            if(result.bins.pass === req.body.pass){
+            if(sessionUtils.checkLogin(req.body.uname, req.body.pass, result.bins.pass, result.bins.salt)){ // result.bins.pass === req.body.pass
                 sessionUtils.logInUser(req.body.uname, res);
 
                 global.logger.info("/login post: user logged in, redir /admin");

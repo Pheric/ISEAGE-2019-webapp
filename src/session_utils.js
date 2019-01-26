@@ -25,7 +25,13 @@ let funcs = {
         });
         return password;
     },
-    checkLogin(req, res, next) {
+    genSalt() {
+        return uuid();
+    },
+    checkLogin(providedPassword, storedPassword, salt) {
+        return argon.verify(providedPassword + salt, storedPassword + salt);
+    },
+    checkLoggedIn(req, res, next) {
         if(!funcs.isUserLoggedIn(req.cookies.username, req.cookies.secret)){
             res.redirect('/login');
         } else {

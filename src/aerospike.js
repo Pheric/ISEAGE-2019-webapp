@@ -171,9 +171,11 @@ module.exports.test = function () {
 
 function addUser(uname, pass, callback) {
     let key = new Aerospike.Key("minimoira", "users", uname);
+    let salt = session_utils.genSalt();
     client.put(key, {
         uname: uname,
-        pass: session_utils.hashPassword(pass)
+        pass: session_utils.hashPassword(pass, salt),
+        salt: salt
     }).then(record => {
         callback(record)
     }).catch(error => logger.error(error))
@@ -184,21 +186,7 @@ module.exports.addUser = addUser;
 function getUser(uname, callback) {
     this.checkconn();
     client.get(new Aerospike.Key("minimoira", "users", uname), function (error, record) {
-        if (error) {
-            switch (error.code) {
-                case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
-                    addUser(uname, session_utils.hashPassword("cdc"), function () {
-                        getUser(uname, function (res) {
-                            callback(res)
-                        })
-                    });
-                    break;
-                default:
-                    console.log('ERR - ', error, key)
-            }
-        } else {
-            callback(record)
-        }
+        callback(error, record)
     })
 }
 
