@@ -6,7 +6,11 @@
 <p>Not only are we the best choice for all your banking needs, we are the only one!</p>
 <p>Look at what everyone has to say!</p>
 <hr>
-<pre>{{ comments | escape | nl2br}}</pre>
+{% for c in comments %}
+<pre><strong>{{ c.uname | escape }}:</strong> {{ c.comment | escape }}</pre>
+{% else %}
+<pre>No comments found!</pre>
+{% endfor %}
 <hr>
 <p>Don't like these? Try another option!</p>
 <div class="btn-group">
