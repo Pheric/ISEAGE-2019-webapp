@@ -6,8 +6,8 @@
 <p>Not only are we the best choice for all your banking needs, we are the only one!</p>
 <p>Look at what everyone has to say!</p>
 <hr>
-{% for c in comments %}
-<pre><strong>{{ c.uname | escape }}:</strong> {{ c.comment | escape }}</pre>
+{% for uname, body in comments %}
+<pre><strong>{{ uname | escape }}:</strong> {{ body | escape }}</pre>
 {% else %}
 <pre>No comments found!</pre>
 {% endfor %}
