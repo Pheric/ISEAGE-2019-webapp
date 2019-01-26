@@ -28,8 +28,8 @@ let funcs = {
     genSalt() {
         return uuid();
     },
-    checkLogin(providedPassword, storedPassword, salt) {
-        return argon.verify(providedPassword + salt, storedPassword + salt);
+    checkLogin(secret, storedPassword, salt) {
+        return argon.verify(secret, storedPassword + salt);
     },
     checkLoggedIn(req, res, next) {
         if(!funcs.isUserLoggedIn(req.cookies.username, req.cookies.secret)){
