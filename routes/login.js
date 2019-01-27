@@ -27,10 +27,10 @@ router.post('/', function (req,res,next) {
         //TODO Add database checks
         aerospike.getUser(req.body.uname, function (err, result) {
             if (aero.status.AEROSPIKE_ERR_RECORD_NOT_FOUND == err.code) {
-                res.render('login.html', {settings: settings, failed: true})
+                res.render('login.html', {settings: settings, failed: true});
                 return;
             }
-            if(sessionUtils.checkLogin(req.body.uname, req.body.pass, result.bins.pass, result.bins.salt)){ // result.bins.pass === req.body.pass
+            if(sessionUtils.checkLogin(req.body.pass, result.bins.pass, result.bins.salt)){ // result.bins.pass === req.body.pass
                 sessionUtils.logInUser(req.body.uname, result.admin, res);
 
                 global.logger.info("/login post: user logged in, redir /admin");
