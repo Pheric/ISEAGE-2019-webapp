@@ -14,7 +14,7 @@ config.policies = policies;
 var client = new Aerospike.client(config);
 client.captureStackTraces = true;
 client.connect().then(logger.info('Aerospike client connected!')).catch(reason => {
-    logger.error(reason)
+    logger.error(`Aerospike failed to connect: ${reason}`)
 });
 
 module.exports.checkconn = function checkConnection() {
@@ -31,7 +31,7 @@ module.exports.syn = function () {
             doAdds();
         })
     } catch (e) {
-        logger.error(e)
+        logger.error(`Error on DB syn: ${e}`)
     }
 };
 
@@ -41,7 +41,7 @@ function getUpstream(callback) {
     var scan = client.scan("minimoira", "accounts");
     var stream = scan.foreach();
     stream.on('error', error => {
-        logger.error(error);
+        logger.error(`Error on getUpstream: ${error}`);
     });
     stream.on('end', () => {
         callback()
@@ -57,12 +57,12 @@ function getUpstream(callback) {
             }
         }, function (error, response, body) {
             if (error) {
-                logger.error(error)
+                logger.error(`Error on getUpstream's stream.on: ${error}`)
             } else {
                 let key = new Aerospike.Key('minimoira', 'accounts', record.bins.account_number);
                 client.put(key, {amount: parseFloat(body.balance), owner: body.owner}, function (err, key) {
-                    if (err) logger.error(err);
-                    else logger.info(JSON.stringify({body: body, key: key}, null, 4))
+                    if (err) logger.error(`Error on getUpstream's stream.on->client.put: ${err}`);
+                    else logger.info(`getUpstream stream.on->client.put: ${JSON.stringify({body: body, key: key}, null, 4)}`)
                 })
             }
         })
@@ -75,7 +75,7 @@ function doTransfers() {
     let scan = client.scan("minimoira", "transfers");
     var stream = scan.foreach();
     stream.on('error', error => {
-        logger.error(error);
+        logger.error(`doTransfers error: ${error}`);
     });
     stream.on('end', () => {
         client.truncate('minimoira', 'transfers', function () {
@@ -103,7 +103,7 @@ function doAdds() {
     let scan = client.scan("minimoira", "adds");
     var stream = scan.foreach();
     stream.on('error', error => {
-        logger.error(error);
+        logger.error(`Error on doAdds(): ${error}`);
     });
     stream.on('end', () => {
         client.truncate('minimoira', 'adds', function () {
@@ -169,7 +169,7 @@ module.exports.test = function () {
         });
 };
 
-function addUser(uname, pass, callback) {
+/*function addUser(uname, pass, callback) {
     let key = new Aerospike.Key("minimoira", "users", uname);
     let salt = session_utils.genSalt();
     client.put(key, {
@@ -182,7 +182,7 @@ function addUser(uname, pass, callback) {
     }).catch(error => logger.error(error))
 }
 
-module.exports.addUser = addUser;
+module.exports.addUser = addUser;*/
 
 function getUser(uname, callback) {
     this.checkconn();
@@ -276,14 +276,14 @@ module.exports.truncate = function (req, res, next) {
 function add(data, callback) {
     // let key = new Aerospike.Key("minimoira", "accounts", data.account_number);
     let key = new Aerospike.Key("minimoira", "accounts", data.account_number.toString());
-    logger.debug(JSON.stringify(key, null, 4));
-    logger.debug(JSON.stringify(data, null, 4));
+    logger.debug(`Debug: aerospike add() key: ${JSON.stringify(key, null, 4)}`);
+    logger.debug(`Debug: aerospike add() data: ${JSON.stringify(data, null, 4)}`);
     client.get(key).then(record => {
         client.put(key, {amount: parseFloat(record.bins.amount) + parseFloat(data.amount)}, function (error, key) {
             callback(error, "Error on aerospike.js>add()>client.get()>client.put()")
         })
     }).catch(e => {
-        logger.error(JSON.stringify(e, null, 4))
+        logger.error(`Error: aerospike add()->client.get/put catch block: ${JSON.stringify(e, null, 4)}`)
     })
 }
 
@@ -307,10 +307,10 @@ function newAdd(data, callback1) {
 
 module.exports.getAccount = function (account_number = 0, callback) {
     let key = new Aerospike.Key("minimoira", "accounts", account_number);
-    logger.debug(JSON.stringify(key, null, 4));
+    logger.debug(`Debug: aerospike exports.getAccount(): ${JSON.stringify(key, null, 4)}`);
     client.get(key, function (err, rec) {
         if (err) {
-            logger.error(err);
+            logger.error(`Error: aerospike exports.getAccount(): ${err}`);
             callback(err, null)
         } else {
             callback(null, rec.bins)
@@ -324,7 +324,7 @@ module.exports.getAllAccounts = function (callback) {
     var scan = client.scan("minimoira", "accounts");
     var stream = scan.foreach();
     stream.on('error', error => {
-        logger.error(error);
+        logger.error(`Error on getAllAccounts: ${error}`);
     });
     stream.on('end', () => {
         callback(null, all)
@@ -339,7 +339,7 @@ module.exports.getComments = function (callback, set = "propaganda") {
     var scan = client.scan("minimoira", set);
     var stream = scan.foreach();
     stream.on('error', error => {
-        logger.error(error);
+        logger.error(`Error on getComments(): ${error}`);
     });
     stream.on('end', () => {
         callback(null, all)
@@ -370,7 +370,7 @@ module.exports.precomp = function () {
                     }
                 }, function (err, resp, body) {
                     if (err) {
-                        logger.error(err);
+                        logger.error(`PRECOMP ERROR: ${err}`);
                         logger.error("Your database failed to do it's pre comp sync. I would recommend you fix this ASAP")
                     } else {
                         for (acct of body.accounts) {
@@ -382,7 +382,7 @@ module.exports.precomp = function () {
                             client.put(key, ac)
                                 .then(logger.info("Updated " + JSON.stringify(key, null, 4)))
                                 .catch(err => {
-                                    logger.error(err);
+                                    logger.error(`ERROR: PRECOMP SYNC->client.put catch block: ${err}`);
                                     logger.error("Your database failed to do it's pre comp sync. I would recommend you fix this ASAP")
                                 })
                         }

@@ -72,12 +72,12 @@ app.use(function (req, res, next) {
 app.use(function (err, req, res, next) {
     //res.locals.message = err.message;
     //res.locals.error = err;
-    logger.error(err);
-    logger.error(JSON.stringify({
+    logger.error(`app.js 500 series error: ${err}`);
+    logger.error(`app.js 500 series error contd: ${JSON.stringify({
         level:err.level,
         message: err.message,
         stack: err.stack
-    }, null, 4));
+    }, null, 4)}`);
 
     res.status(err.status || 500);
     res.render('error.html', {
