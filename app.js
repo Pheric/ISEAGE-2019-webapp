@@ -25,7 +25,7 @@ if (process.env.NODE_ENV !== 'production') {
         format: winston.format.combine(winston.format.colorize(), winston.format.simple())
     }));
 }
-//logger.debug(JSON.stringify(settings, null, 4));
+
 let njenv = new nunjucks.Environment(new nunjucks.FileSystemLoader('views', {watch:true}), {
     autoescape: false,
     trimBlocks: true,
@@ -33,7 +33,6 @@ let njenv = new nunjucks.Environment(new nunjucks.FileSystemLoader('views', {wat
 });
 njenv.addGlobal("settings", settings)
     .express(app);
-//logger.info(JSON.stringify(njenv.getGlobal("settings")));
 
 var logStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), {flags: 'a'}); //TODO this needs pointed to /var/log
 app.use(app_logger('common', {stream: logStream}));

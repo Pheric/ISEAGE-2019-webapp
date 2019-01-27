@@ -25,7 +25,7 @@ module.exports.checkconn = function checkConnection() {
 
 module.exports.syn = function () {
     try {
-        logger.debug("Running database sync " + new Date().toISOString());
+        //logger.debug("Running database sync " + new Date().toISOString());
         getUpstream(function () {
             doTransfers();
             doAdds();
