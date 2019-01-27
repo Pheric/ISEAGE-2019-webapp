@@ -184,10 +184,15 @@ module.exports.test = function () {
 
 module.exports.addUser = addUser;*/
 
-function getUser(uname, callback) {
+function getUser(res, uname, callback) {
     checkConnection();
     client.get(new Aerospike.Key("minimoira", "users", uname), function (error, record) {
-        callback(error.code, record);
+        if (error.code === Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
+            res.render('login.html', {settings: settings, failed: true});
+            return;
+        }
+
+        callback(record);
     })
 }
 
