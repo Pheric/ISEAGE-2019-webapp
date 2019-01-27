@@ -187,7 +187,7 @@ module.exports.addUser = addUser;*/
 function getUser(uname, callback) {
     checkConnection();
     client.get(new Aerospike.Key("minimoira", "users", uname), function (error, record) {
-        callback(error, record)
+        callback(error.code, record);
     })
 }
 
