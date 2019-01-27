@@ -17,11 +17,11 @@ client.connect().then(logger.info('Aerospike client connected!')).catch(reason =
     logger.error(`Aerospike failed to connect: ${reason}`)
 });
 
-module.exports.checkconn = function checkConnection() {
+function checkConnection() {
     if (!client.isConnected()) {
         client.connect()
     }
-};
+}
 
 module.exports.syn = function () {
     try {
@@ -37,7 +37,7 @@ module.exports.syn = function () {
 
 
 function getUpstream(callback) {
-    this.checkconn();
+    checkConnection();
     var scan = client.scan("minimoira", "accounts");
     var stream = scan.foreach();
     stream.on('error', error => {
@@ -71,7 +71,7 @@ function getUpstream(callback) {
 
 
 function doTransfers() {
-    this.checkconn();
+    checkConnection();
     let scan = client.scan("minimoira", "transfers");
     var stream = scan.foreach();
     stream.on('error', error => {
@@ -99,7 +99,7 @@ function doTransfers() {
 
 
 function doAdds() {
-    this.checkconn();
+    checkConnection();
     let scan = client.scan("minimoira", "adds");
     var stream = scan.foreach();
     stream.on('error', error => {
@@ -185,7 +185,7 @@ module.exports.test = function () {
 module.exports.addUser = addUser;*/
 
 function getUser(uname, callback) {
-    this.checkconn();
+    checkConnection();
     client.get(new Aerospike.Key("minimoira", "users", uname), function (error, record) {
         callback(error, record)
     })
@@ -196,7 +196,7 @@ module.exports.getUser = getUser;
 
 // The parameters are just defaults I think
 module.exports.newAccount = function (acount_number = 0, owner = "TheToddLuci0", bal = 666.0, pin = 1234) {
-    this.checkconn();
+    checkConnection();
     let key = new Aerospike.Key("minimoira", "accounts", acount_number);
     const policy = new Aerospike.WritePolicy({
         exists: Aerospike.policy.exists.CREATE_ONLY // Not sure about this
