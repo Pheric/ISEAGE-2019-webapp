@@ -31,8 +31,8 @@ let funcs = {
     genSalt() {
         return uuid();
     },
-    checkLogin(password, secret, salt) {
-        return argon.verify(secret, password + salt);
+    async checkLogin(password, secret, salt) {
+        return await argon.verify(secret, password + salt);
     },
     checkLoggedIn(req, res, next) {
         if(!funcs.isUserLoggedIn(req.cookies.username, req.cookies.secret)){
