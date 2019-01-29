@@ -21,11 +21,13 @@ router.post('/', function (req,res,next) {
         return;
     }
 
-    res.status(401);
-
     if (req.body.uname !== undefined && req.body.pass !== undefined) {
         //TODO Add database checks
-        aerospike.getUser(res, req.body.uname, function (result) {
+        aerospike.getUser(res, req.body.uname, function (error, result) {
+            if (error && error.code === aero.status.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
+                res.render("login.html", { settings: settings, failed: true });
+                return;
+            }
             if(sessionUtils.checkLogin(req.body.pass, result.bins.pass, result.bins.salt)){ // result.bins.pass === req.body.pass
                 sessionUtils.logInUser(req.body.uname, result.bins.admin, res);
 
