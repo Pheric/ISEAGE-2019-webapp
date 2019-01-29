@@ -19,7 +19,7 @@ let funcs = {
         res.cookie("username", username, { maxAge: 1000 * 60 * 20 /* 20 minutes */});
         res.cookie("secret", salt, { maxAge: 1000 * 60 * 10 /* 10 minutes */, httpOnly: true });
 
-        if (admin === 1) admins.push(username);
+        if (admin == 1) admins.push(username);
     },
     hashPassword(password, salt = "") {
         // TODO
