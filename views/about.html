@@ -7,7 +7,7 @@
 <p>Look at what everyone has to say!</p>
 <hr>
 {% for uname, body in comments %}
-<pre><strong>{{ uname | escape }}:</strong> {{ body | escape }}</pre>
+<pre style="margin-bottom: 0;"><hr><strong style="color: #dc3545">Comrade {{ uname | escape }}<br></strong> {{ body | escape }}</pre>
 {% else %}
 <pre>No comments found!</pre>
 {% endfor %}
