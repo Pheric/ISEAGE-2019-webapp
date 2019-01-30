@@ -36,6 +36,7 @@ module.exports.syn = function () {
 };
 
 
+/** Pulls information about an account from bank2node (the central bank) and updates the database **/
 function getUpstream(callback) {
     checkConnection();
     var scan = client.scan("minimoira", "accounts");
@@ -47,8 +48,10 @@ function getUpstream(callback) {
         callback()
     });
     stream.on('data', record => {
+        // make new GET request
         request.get({
             uri: '/read.cgi',
+            // url of bank2node
             baseUrl: settings.P9_2_json.ip,
             useQuerystring: true,
             qs: {
@@ -70,6 +73,7 @@ function getUpstream(callback) {
 }
 
 
+/** Updates the central bank with all local transactions **/
 function doTransfers() {
     checkConnection();
     let scan = client.scan("minimoira", "transfers");

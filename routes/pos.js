@@ -3,17 +3,32 @@ const router = express.Router();
 const as = require('../src/aerospike');
 
 
-router.get('/balance/:acct/', function (req, res, next) {
+router.get('/balance/:acct/:pin', function (req, res, next) {
     let acct = req.params.acct;
+    let pin = req.params.pin;
     as.getAccount(acct, function (err, dat) {
-        dat.balance = dat.amount;
-        res.json(dat)
+        if(err) {
+            if (err.code === require('aerospike').status.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
+                res.json({"error": `Invalid account number ${acct}`});
+            } else {
+                res.json({"error": `Internal database error`});
+            }
+        } else if (dat.pin != pin) {
+            res.json({"error": `invalid pin for account number ${acct}`});
+        } else {
+            delete dat["pin"];
+            delete dat["owner"];
+            delete dat["account"];
+            dat.balance = dat.amount;
+            res.json(dat);
+        }
     });
 });
-router.get("/balance", function (req, res, nexr) {
+router.get("/balance/all", function (req, res, nexr) {
+    // TODO Check API key
     let s = {};
     s.recieved = req.body;
-    s.message = "This is the over-sharing endpoint";
+    s.message = "Your balances, comrade";
     s.balances = [];
     as.getAllAccounts(function (err, all) {
         for (i of Object.keys(all)){
