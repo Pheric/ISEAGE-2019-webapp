@@ -86,7 +86,7 @@ router.post('/add', function (req, res, next) {
         }
     })
 });
-router.post('/transfer', function (req, res, next) {
+router.post('/transfer', async function (req, res, next) {
     let s = {};
 
     let required_data = ['account_number', 'amount', 'pin', 'destination'];
@@ -103,15 +103,19 @@ router.post('/transfer', function (req, res, next) {
         s.message = "missing required information!";
         res.json(s);
     }
-    as.getAccount(req.body.account_number, (err, resp) => {
-        if (err) {
+    try {
+        let pinCode = await as.checkAccountPin(req.body.account_number, req.body.pin);
+        if (!pinCode) {
             res.status(401);
             s.success = false;
-            s.message = "invalid pin";
+            s.message = "error: invalid pin";
             res.json(s);
-            global.logger.info("Execution passes res.json");
         }
-    });
+    } catch (e) {
+        s.success = false;
+        s.message = "error: record doesn't exist or an internal error occurred";
+        res.json(s);
+    }
 
     s.recieved = req.body;
     //s.expected = require('../samples/pos_transfer');
