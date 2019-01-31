@@ -4,26 +4,28 @@ const as = require('../src/aerospike');
 const aeroStat = require('aerospike').status;
 
 
-router.get('/balance/:acct/:pin', function (req, res, next) {
+router.get('/balance/:acct/:pin', async function (req, res, next) {
     let acct = req.params.acct;
     let pin = req.params.pin;
-    as.getAccount(acct, function (err, dat) {
-        if(err) {
-            if (err.code === aeroStat.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
-                res.json({"error": `Invalid account number ${acct}`});
-            } else {
-                res.json({"error": `Internal database error`});
-            }
-        } else if (dat.pin != pin) {
+    try {
+        let data = await as.getAccount(acct);
+        if (data.bins.pin != pin) {
             res.json({"error": `invalid pin for account number ${acct}`});
-        } else {
-            delete dat["pin"];
-            delete dat["owner"];
-            dat.balance = dat.amount;
-            delete dat["amount"];
-            res.json(dat);
+            return;
         }
-    });
+
+        delete data["pin"];
+        delete data["owner"];
+        data.balance = data.amount;
+        delete data["amount"];
+        res.json(data);
+    } catch (e) {
+        if (e.code === aeroStat.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
+            res.json({"error": `Invalid account number ${acct}`});
+        } else {
+            res.json({"error": `Internal database error`});
+        }
+    }
 });
 router.get("/balance/all", function (req, res, nexr) {
     let s = {};
@@ -41,7 +43,7 @@ router.get("/balance/all", function (req, res, nexr) {
         res.json(s)
     })
 });
-router.post('/add', function (req, res, next) {
+router.post('/add', async function (req, res, next) {
     let s = {};
 
     let required_data = ['account_number', 'amount', 'pin'];
@@ -58,17 +60,22 @@ router.post('/add', function (req, res, next) {
         s.message = "missing required information!";
         res.json(s);
     }
-    as.getAccount(req.body.account_number, function (err, dat) {
-        if(err) {
-            if (err.code === aeroStat.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
-                res.json({"error": `Invalid account number ${acct}`});
-            } else {
-                res.json({"error": `Internal database error`});
-            }
-        } else if (dat.pin != req.body.pin) {
-            res.json({"error": `invalid pin for account number ${acct}`});
+    try {
+        let pinCode = await as.checkAccountPin(req.body.account_number, req.body.pin);
+        if (!pinCode) {
+            res.status(401);
+            s.success = false;
+            s.message = "error: invalid pin";
+            res.json(s);
+            return;
         }
-    });
+    } catch (e) {
+        global.logger.info(`Exception caught in POST /add: ${e}`);
+        s.success = false;
+        s.message = "error: an internal error occurred";
+        res.json(s);
+        return;
+    }
 
     s.recieved = req.body;
     //s.expected = require('../samples/pos_add');
@@ -136,7 +143,7 @@ router.post('/transfer', async function (req, res, next) {
         }
     })
 });
-router.put('/transfer', function (req, res, next) {
+router.put('/transfer', async function (req, res, next) {
     let s = {};
 
     let required_data = ['account_number', 'amount', 'pin', 'destination'];
@@ -153,18 +160,22 @@ router.put('/transfer', function (req, res, next) {
         s.message = "missing required information!";
         res.json(s);
     }
-    as.getAccount(req.body.account_number, function (err, dat) {
-        if(err) {
-            if (err.code === aeroStat.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
-                res.json({"error": `Invalid account number ${acct}`});
-            } else {
-                res.json({"error": `Internal database error`});
-            }
-        } else if (dat.pin != req.body.pin) {
-            res.json({"error": `invalid pin for account number ${acct}`});
+    try {
+        let pinCode = await as.checkAccountPin(req.body.account_number, req.body.pin);
+        if (!pinCode) {
+            res.status(401);
+            s.success = false;
+            s.message = "error: invalid pin";
+            res.json(s);
+            return;
         }
-    });
-
+    } catch (e) {
+        global.logger.info(`Exception caught in PUT /transfer: ${e}`);
+        s.success = false;
+        s.message = "error: an internal error occurred";
+        res.json(s);
+        return;
+    }
 
     s.recieved = req.body;
     //s.expected = require('../samples/pos_transfer');
