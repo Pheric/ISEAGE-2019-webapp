@@ -110,11 +110,13 @@ router.post('/transfer', async function (req, res, next) {
             s.success = false;
             s.message = "error: invalid pin";
             res.json(s);
+            return;
         }
     } catch (e) {
         s.success = false;
         s.message = "error: record doesn't exist or an internal error occurred";
         res.json(s);
+        return;
     }
 
     s.recieved = req.body;
