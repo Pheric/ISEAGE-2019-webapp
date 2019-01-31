@@ -350,7 +350,11 @@ async function checkAccountPin(accountNumber, pin) {
         let data = await getAccount(accountNumber);
         return data.bins.pin === pin;
     } catch (e) {
-        throw e
+        if (e.code === Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
+            return 0;
+        } else {
+            throw e;
+        }
     }
 }
 

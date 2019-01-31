@@ -113,8 +113,9 @@ router.post('/transfer', async function (req, res, next) {
             return;
         }
     } catch (e) {
+        global.logger.info(`Exception caught in POST /transfer: ${e}`);
         s.success = false;
-        s.message = "error: record doesn't exist or an internal error occurred";
+        s.message = "error: an internal error occurred";
         res.json(s);
         return;
     }
