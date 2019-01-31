@@ -9,9 +9,17 @@ router.get('/', function (req,res,next) {
 router.get('/newAccount', function (req, res, next) {
     res.render('newAccount.html', {settings: settings})
 });
-router.post('/newAccount', function (req, res, next) {
-    as.newAccount(req.body.account_number, req.body.owner, req.body.bal, req.body.pin);
-    res.redirect("/account/num/" + req.body.account_number.toString())
+router.post('/newAccount', async function (req, res, next) {
+    if (req.body.account_number === undefined || req.body.owner || req.body.bal === undefined || req.body.pin === undefined ) {
+        res.render('error.html', {error: "one or more of the required fields is undefined!"})
+    } else {
+        try {
+            await as.newAccount(req.body.account_number, req.body.owner, req.body.bal, req.body.pin);
+            res.redirect("/account/num/" + req.body.account_number.toString())
+        } catch (e) {
+            res.render('error.html', {error: "account creation failed. Does this account already exist?"})
+        }
+    }
 });
 router.get('/add', function (req, res, next) {
     res.render('add.html',{settings: settings})

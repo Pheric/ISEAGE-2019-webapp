@@ -199,18 +199,24 @@ module.exports.getUser = getUser;
 
 
 // The parameters are just defaults I think
-module.exports.newAccount = function (acount_number = 0, owner = "TheToddLuci0", bal = 666.0, pin = 1234) {
+module.exports.newAccount = async function (acount_number = 0, owner = "TheToddLuci0", bal = 666.0, pin = 1234) {
     checkConnection();
     let key = new Aerospike.Key("minimoira", "accounts", acount_number);
     const policy = new Aerospike.WritePolicy({
         exists: Aerospike.policy.exists.CREATE_ONLY // Not sure about this
     });
-    client.put(key, {
-        pin: pin,
-        account_number: acount_number,
-        owner: owner,
-        amount: new Aerospike.Double(bal)
-    }, policy);
+    try {
+        await client.put(key, {
+            pin: pin,
+            account_number: acount_number,
+            owner: owner,
+            amount: new Aerospike.Double(bal)
+        }, policy);
+    } catch (e) {
+        throw e;
+    }
+
+    // I hope this doesn't go wrong, some people could potentially be very unhappy
     request.post({
         baseUrl: settings.P9_2_json.ip + settings.P9_2_json.port.toString(),
         uri: '/acct.cgi',
