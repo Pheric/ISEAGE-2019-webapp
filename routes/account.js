@@ -2,23 +2,21 @@ let express = require('express');
 let router = express.Router();
 let as = require('../src/aerospike');
 
-router.get('/num/:account_number', function (req, res, next) {
-    as.getAccount(req.params.account_number, function (err, rec) {
-        if (err){
-            res.render("error.html", {error: err})
-        } else {
-            res.render("account.html", {account: rec})
-        }
-    })
+router.get('/num/:account_number', async function (req, res, next) {
+    try {
+        let data = await as.getAccount(req.params.account_number);
+        res.render("account.html", {account: data})
+    } catch (e) {
+        res.render("error.html", {error: e})
+    }
 });
-router.post('/num/:account_number', function (req, res, next) {
-    as.getAccount(req.params.account_number, function (err, rec) {
-        if (err){
-            res.render("error.html", {error: err})
-        } else {
-            res.render("account.html", {account: rec})
-        }
-    })
+router.post('/num/:account_number', async function (req, res, next) {
+    try {
+        let data = await as.getAccount(req.params.account_number);
+        res.render("account.html", {account: data})
+    } catch (e) {
+        res.render("error.html", {error: e})
+    }
 });
 router.get('/', function (req, res, next) {
     as.getAllAccounts(function (err, all) {
