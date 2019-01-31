@@ -86,7 +86,7 @@ router.post('/add', function (req, res, next) {
         }
     })
 });
-router.post('/transfer', function (req, res, next) {
+router.post('/transfer', async function (req, res, next) {
     let s = {};
 
     let required_data = ['account_number', 'amount', 'pin', 'destination'];
@@ -103,7 +103,7 @@ router.post('/transfer', function (req, res, next) {
         s.message = "missing required information!";
         res.json(s);
     }
-    let pinCode = as.checkAccountPin(req.body.account_number, req.body.pin);
+    let pinCode = await as.checkAccountPin(req.body.account_number, req.body.pin);
     if (pinCode !== 1) {
         res.status(401);
         s.success = false;
