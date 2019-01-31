@@ -2,7 +2,6 @@ var express = require('express');
 const router = express.Router();
 const as = require('../src/aerospike');
 const aeroStat = require('aerospike').status;
-let sessionUtils = require('../src/session_utils');
 
 
 router.get('/balance/:acct/:pin', function (req, res, next) {
@@ -104,7 +103,7 @@ router.post('/transfer', function (req, res, next) {
         s.message = "missing required information!";
         res.json(s);
     }
-    let pinCode = sessionUtils.checkAccountPin(req.body.account_number, req.body.pin);
+    let pinCode = as.checkAccountPin(req.body.account_number, req.body.pin);
     if (pinCode !== 1) {
         res.status(401);
         s.success = false;

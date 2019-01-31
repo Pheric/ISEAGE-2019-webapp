@@ -345,12 +345,22 @@ module.exports.getAccount = function (account_number = 0, callback) {
         }
     })
 };
-// function getUser(res, uname, callback) {
-//     checkConnection();
-//     client.get(new Aerospike.Key("minimoira", "users", uname), (error, record) => {
-//         callback(error, record);
-//     })
-// }
+
+module.exports.checkAccountPin = function(accountNumber, pin) {
+    as.getAccount(accountNumber, function (err, dat) {
+        if(err) {
+            if (err.code === Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
+                return -1
+            } else {
+                return -2
+            }
+        } else if (dat.pin != pin) {
+            return 0
+        } else {
+            return 1;
+        }
+    });
+};
 
 
 module.exports.getAllAccounts = function (callback) {
