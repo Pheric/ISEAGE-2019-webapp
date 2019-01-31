@@ -71,9 +71,9 @@ router.post('/add', function (req, res, next) {
     });
 
     s.recieved = req.body;
-    s.expected = require('../samples/pos_add');
+    //s.expected = require('../samples/pos_add');
     s.message = "This is the add/subtract balance endpoint.";
-    as.addTransaction("add", req.body, function (err, result) {
+    as.addTransaction("add", req.body, function (err) {
         if (err){
             res.status(400);
             s.success = false;
@@ -117,13 +117,13 @@ router.post('/transfer', function (req, res, next) {
 
 
     s.recieved = req.body;
-    s.expected = require('../samples/pos_transfer');
+    //s.expected = require('../samples/pos_transfer');
     s.message = "This is the transfer balance endpoint.";
     as.addTransaction("transfer", req.body, function (err, result) {
         if (err){
             res.status(400);
             s.success = false;
-            s.error = "An error occurred.";
+            s.error = err;
             res.json(s)
         } else{
             res.status(201);
@@ -163,13 +163,13 @@ router.put('/transfer', function (req, res, next) {
 
 
     s.recieved = req.body;
-    s.expected = require('../samples/pos_transfer');
+    //s.expected = require('../samples/pos_transfer');
     s.message = "This is the transfer balance endpoint.";
     as.addTransaction("transfer", req.body, function (err, result) {
         if (err){
             res.status(400);
             s.success = false;
-            s.error = "An error occurred.";
+            s.error = err;
             res.json(s)
         } else{
             res.status(201);

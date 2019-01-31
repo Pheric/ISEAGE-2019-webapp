@@ -230,13 +230,13 @@ module.exports.addTransaction = function (type, data, callback) {
     let res = false;
     switch (type.toLowerCase()) {
         case "transfer":
-            addTransfer(data, function (res) {
-                callback(null, res)
+            addTransfer(data, function (err) {
+                callback(err)
             });
             break;
         case "add":
-            newAdd(data, function (res) {
-                callback(null, res)
+            newAdd(data, function (err) {
+                callback(err)
             });
             break;
         default:
@@ -247,18 +247,29 @@ module.exports.addTransaction = function (type, data, callback) {
 
 function addTransfer(data, callback1) {
     let id = uuid();
+    let amt = parseFloat(data.amount);
+    let pin = parseInt(data.pin);
+    let acct = parseInt(data.account_number);
+    let dstAcct = parseInt(data.destination.account_number);
+    let dstBranch = parseInt(data.destination.branch);
+
+    if (isNaN(amt) || isNaN(pin) || isNaN(acct) || isNaN(dstAcct) || isNaN(dstBranch)) {
+        callback1(new Error("Input NaN"));
+        return;
+    }
+
     let key = new Aerospike.Key("minimoira", "transfers", id);
     client.put(key, {
         action: "transfer",
-        faccnt: parseInt(data.account_number),
+        faccnt: acct,
         fbank: parseInt(settings.team),
-        amount: new Aerospike.Double(parseFloat(data.amount)),
-        pin: parseInt(data.pin),
-        taccnt: parseInt(data.destination.account_number),
-        tbank: parseInt(data.destination.branch)
+        amount: new Aerospike.Double(amt),
+        pin: pin,
+        taccnt: dstAcct,
+        tbank: dstBranch
     });
-    add({account_number: data.account_number, amount: 0 - data.amount}, function (res) {
-        callback1(res)
+    add({account_number: acct, amount: 0 - amt}, function (error) {
+        callback1(error)
     })
 }
 
@@ -284,7 +295,7 @@ function add(data, callback) {
     logger.debug(`Debug: aerospike add() data: ${JSON.stringify(data, null, 4)}`);
     client.get(key).then(record => {
         client.put(key, {amount: parseFloat(record.bins.amount) + parseFloat(data.amount)}, function (error, key) {
-            callback(error, "Error on aerospike.js>add()>client.get()>client.put()")
+            callback(error)
         })
     }).catch(e => {
         logger.error(`Error: aerospike add()->client.get/put catch block: ${JSON.stringify(e, null, 4)}`)
@@ -295,16 +306,29 @@ function add(data, callback) {
 function newAdd(data, callback1) {
     let id = uuid();
     let key = new Aerospike.Key("minimoira", "adds", id);
+    let amt = parseFloat(data.amount);
+    let pin = parseInt(data.pin);
+    let acct = parseInt(data.account_number);
+
+    if (isNaN(amt) || isNaN(pin) || isNaN(acct)) {
+        callback1(new Error("Input NaN"), null);
+        return;
+    }
+
     client.put(key, {
         action: "add",
-        amnt: new Aerospike.Double(data.amount),
-        pin: parseInt(data.pin),
-        acct: parseInt(data.account_number)
+        amnt: new Aerospike.Double(amt),
+        pin: pin,
+        acct: acct
     });
-    add({account_number: data.account_number, amount: data.amount}, function (res) {
-        add({account_number: 0, amount: 0 - data.amount}, function () {
-            callback1(res)
-        })
+    add({account_number: acct, amount: amt}, function (error) {
+        if (error) {
+            callback1(error);
+        } else {
+            add({account_number: 0, amount: 0 - data.amount}, function (error) {
+                callback1(error)
+            })
+        }
     })
 }
 
