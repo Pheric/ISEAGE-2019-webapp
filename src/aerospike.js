@@ -333,10 +333,10 @@ function newAdd(data, callback1) {
 }
 
 
-async function getAccount (account_number = 0, callback) {
+function getAccount (account_number = 0, callback) {
     let key = new Aerospike.Key("minimoira", "accounts", account_number);
     logger.debug(`Debug: aerospike exports.getAccount(): ${JSON.stringify(key, null, 4)}`);
-    await client.get(key, (err, rec) => {
+    client.get(key, (err, rec) => {
         if (err) {
             logger.error(`Error: aerospike exports.getAccount(): ${err}`);
             callback(err, null)
@@ -348,8 +348,8 @@ async function getAccount (account_number = 0, callback) {
 
 module.exports.getAccount = getAccount;
 
-async function checkAccountPin(accountNumber, pin) {
-    await getAccount(accountNumber, function (err, dat) {
+function checkAccountPin(accountNumber, pin) {
+    getAccount(accountNumber, function (err, dat) {
         if(err) {
             if (err.code === Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
                 return -1
