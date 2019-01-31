@@ -345,6 +345,12 @@ module.exports.getAccount = function (account_number = 0, callback) {
         }
     })
 };
+// function getUser(res, uname, callback) {
+//     checkConnection();
+//     client.get(new Aerospike.Key("minimoira", "users", uname), (error, record) => {
+//         callback(error, record);
+//     })
+// }
 
 
 module.exports.getAllAccounts = function (callback) {

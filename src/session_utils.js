@@ -1,6 +1,7 @@
 let argon = require("argon2");
 let hm = require("hashmap");
 let uuid = require('uuid/v4');
+const aeroStat = require('aerospike').status;
 
 // acct number | secret (type string)
 let sessionMap = new hm.HashMap();
@@ -20,16 +21,6 @@ let funcs = {
         res.cookie("secret", salt, { maxAge: 1000 * 60 * 10 /* 10 minutes */, httpOnly: true });
 
         if (admin == 1) admins.push(username);
-    },
-    hashPassword(password, salt = "") {
-        // TODO
-        argon.hash(password, salt).then(hash => {
-            global.logger.info("Calling hashPassword(" + password + "): " + hash);
-        });
-        return password;
-    },
-    genSalt() {
-        return uuid();
     },
     async checkLogin(password, secret, salt) {
         return await argon.verify(secret, password + salt);
@@ -52,6 +43,21 @@ let funcs = {
     logoutUser(res) {
         res.cookie("username", "", {maxAge: 1});
         res.cookie("secret", "", {maxAge: 1});
+    },
+    checkAccountPin(accountNumber, pin) {
+        as.getAccount(accountNumber, function (err, dat) {
+            if(err) {
+                if (err.code === aeroStat.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
+                    return -1
+                } else {
+                    return -2
+                }
+            } else if (dat.pin != pin) {
+                return 0
+            } else {
+                return 1;
+            }
+        });
     }
 };
 

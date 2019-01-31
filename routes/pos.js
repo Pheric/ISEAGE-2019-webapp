@@ -2,6 +2,7 @@ var express = require('express');
 const router = express.Router();
 const as = require('../src/aerospike');
 const aeroStat = require('aerospike').status;
+let sessionUtils = require('../src/session_utils');
 
 
 router.get('/balance/:acct/:pin', function (req, res, next) {
@@ -103,18 +104,14 @@ router.post('/transfer', function (req, res, next) {
         s.message = "missing required information!";
         res.json(s);
     }
-    as.getAccount(req.body.account_number, function (err, dat) {
-        if(err) {
-            if (err.code === aeroStat.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
-                res.json({"error": `Invalid account number ${acct}`});
-            } else {
-                res.json({"error": `Internal database error`});
-            }
-        } else if (dat.pin != req.body.pin) {
-            res.json({"error": `invalid pin for account number ${acct}`});
-        }
-    });
-
+    let pinCode = sessionUtils.checkAccountPin(req.body.account_number, req.body.pin);
+    if (pinCode !== 1) {
+        res.status(401);
+        s.success = false;
+        s.message = `invalid pin: error: code ${pinCode}`;
+        res.json(s);
+        return;
+    }
 
     s.recieved = req.body;
     //s.expected = require('../samples/pos_transfer');
