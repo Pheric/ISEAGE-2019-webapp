@@ -14,11 +14,7 @@ router.get('/balance/:acct/:pin', async function (req, res, next) {
             return;
         }
 
-        delete data["pin"];
-        delete data["owner"];
-        data.balance = data.amount;
-        delete data["amount"];
-        res.json(data);
+        res.json({"balance": data.bins.amount});
     } catch (e) {
         if (e.code === aeroStat.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
             res.json({"error": `Invalid account number ${acct}`});
