@@ -19,14 +19,13 @@ router.get('/balance/:acct/:pin', function (req, res, next) {
         } else {
             delete dat["pin"];
             delete dat["owner"];
-            delete dat["amount"];
             dat.balance = dat.amount;
+            delete dat["amount"];
             res.json(dat);
         }
     });
 });
 router.get("/balance/all", function (req, res, nexr) {
-    // TODO Check API key
     let s = {};
     s.recieved = req.body;
     s.message = "Your balances, comrade";
