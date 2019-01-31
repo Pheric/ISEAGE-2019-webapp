@@ -1,6 +1,7 @@
 var express = require('express');
 const router = express.Router();
 const as = require('../src/aerospike');
+const aeroStat = require('aerospike').status;
 
 
 router.get('/balance/:acct/:pin', function (req, res, next) {
@@ -8,7 +9,7 @@ router.get('/balance/:acct/:pin', function (req, res, next) {
     let pin = req.params.pin;
     as.getAccount(acct, function (err, dat) {
         if(err) {
-            if (err.code === require('aerospike').status.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
+            if (err.code === aeroStat.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
                 res.json({"error": `Invalid account number ${acct}`});
             } else {
                 res.json({"error": `Internal database error`});
@@ -18,7 +19,7 @@ router.get('/balance/:acct/:pin', function (req, res, next) {
         } else {
             delete dat["pin"];
             delete dat["owner"];
-            delete dat["account"];
+            delete dat["amount"];
             dat.balance = dat.amount;
             res.json(dat);
         }
@@ -43,12 +44,39 @@ router.get("/balance/all", function (req, res, nexr) {
 });
 router.post('/add', function (req, res, next) {
     let s = {};
+
+    let required_data = ['account_number', 'amount', 'pin'];
+    let ok = true;
+    for (let i = 0; i < required_data.length; i++) {
+        if (req.body[required_data[i]] === undefined) {
+            ok = false;
+            break;
+        }
+    }
+    if (!ok) {
+        res.status(400);
+        s.success = false;
+        s.message = "missing required information!";
+        res.json(s);
+    }
+    as.getAccount(req.body.account_number, function (err, dat) {
+        if(err) {
+            if (err.code === aeroStat.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
+                res.json({"error": `Invalid account number ${acct}`});
+            } else {
+                res.json({"error": `Internal database error`});
+            }
+        } else if (dat.pin != req.body.pin) {
+            res.json({"error": `invalid pin for account number ${acct}`});
+        }
+    });
+
     s.recieved = req.body;
     s.expected = require('../samples/pos_add');
     s.message = "This is the add/subtract balance endpoint.";
     as.addTransaction("add", req.body, function (err, result) {
         if (err){
-            res.status(418);
+            res.status(400);
             s.success = false;
             s.error = err;
             res.json(s)
@@ -61,14 +89,42 @@ router.post('/add', function (req, res, next) {
 });
 router.post('/transfer', function (req, res, next) {
     let s = {};
+
+    let required_data = ['account_number', 'amount', 'pin', 'destination'];
+    let ok = true;
+    for (let i = 0; i < required_data.length; i++) {
+        if (req.body[required_data[i]] === undefined) {
+            ok = false;
+            break;
+        }
+    }
+    if (!ok || req.body.destination.account_number === undefined || req.body.destination.branch === undefined) {
+        res.status(400);
+        s.success = false;
+        s.message = "missing required information!";
+        res.json(s);
+    }
+    as.getAccount(req.body.account_number, function (err, dat) {
+        if(err) {
+            if (err.code === aeroStat.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
+                res.json({"error": `Invalid account number ${acct}`});
+            } else {
+                res.json({"error": `Internal database error`});
+            }
+        } else if (dat.pin != req.body.pin) {
+            res.json({"error": `invalid pin for account number ${acct}`});
+        }
+    });
+
+
     s.recieved = req.body;
     s.expected = require('../samples/pos_transfer');
     s.message = "This is the transfer balance endpoint.";
     as.addTransaction("transfer", req.body, function (err, result) {
-        if (err ){
-            res.status(418);
+        if (err){
+            res.status(400);
             s.success = false;
-            s.error = err;
+            s.error = "An error occurred.";
             res.json(s)
         } else{
             res.status(201);
@@ -79,14 +135,42 @@ router.post('/transfer', function (req, res, next) {
 });
 router.put('/transfer', function (req, res, next) {
     let s = {};
+
+    let required_data = ['account_number', 'amount', 'pin', 'destination'];
+    let ok = true;
+    for (let i = 0; i < required_data.length; i++) {
+        if (req.body[required_data[i]] === undefined) {
+            ok = false;
+            break;
+        }
+    }
+    if (!ok || req.body.destination.account_number === undefined || req.body.destination.branch === undefined) {
+        res.status(400);
+        s.success = false;
+        s.message = "missing required information!";
+        res.json(s);
+    }
+    as.getAccount(req.body.account_number, function (err, dat) {
+        if(err) {
+            if (err.code === aeroStat.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
+                res.json({"error": `Invalid account number ${acct}`});
+            } else {
+                res.json({"error": `Internal database error`});
+            }
+        } else if (dat.pin != req.body.pin) {
+            res.json({"error": `invalid pin for account number ${acct}`});
+        }
+    });
+
+
     s.recieved = req.body;
     s.expected = require('../samples/pos_transfer');
     s.message = "This is the transfer balance endpoint.";
     as.addTransaction("transfer", req.body, function (err, result) {
-        if (err ){
-            res.status(418);
+        if (err){
+            res.status(400);
             s.success = false;
-            s.error = err;
+            s.error = "An error occurred.";
             res.json(s)
         } else{
             res.status(201);
