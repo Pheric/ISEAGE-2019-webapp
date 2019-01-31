@@ -333,7 +333,7 @@ function newAdd(data, callback1) {
 }
 
 
-module.exports.getAccount = function (account_number = 0, callback) {
+function getAccount (account_number = 0, callback) {
     let key = new Aerospike.Key("minimoira", "accounts", account_number);
     logger.debug(`Debug: aerospike exports.getAccount(): ${JSON.stringify(key, null, 4)}`);
     client.get(key, function (err, rec) {
@@ -344,10 +344,12 @@ module.exports.getAccount = function (account_number = 0, callback) {
             callback(null, rec.bins)
         }
     })
-};
+}
 
-module.exports.checkAccountPin = function(accountNumber, pin) {
-    as.getAccount(accountNumber, function (err, dat) {
+module.exports.getAccount = getAccount;
+
+function checkAccountPin(accountNumber, pin) {
+    getAccount(accountNumber, function (err, dat) {
         if(err) {
             if (err.code === Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND) {
                 return -1
@@ -360,7 +362,9 @@ module.exports.checkAccountPin = function(accountNumber, pin) {
             return 1;
         }
     });
-};
+}
+
+module.exports.checkAccountPin = checkAccountPin;
 
 
 module.exports.getAllAccounts = function (callback) {
