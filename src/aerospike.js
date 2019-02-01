@@ -1,7 +1,6 @@
 const Aerospike = require('aerospike');
 const uuid = require('uuid/v4');
 let request = require('request');
-let session_utils = require('./session_utils.js');
 
 const config = as_settings;
 let policies = {
@@ -24,6 +23,7 @@ function checkConnection() {
 }
 
 module.exports.syn = function () {
+    checkConnection();
     try {
         //logger.debug("Running database sync " + new Date().toISOString());
         getUpstream(function () {
@@ -199,25 +199,26 @@ module.exports.getUser = getUser;
 
 
 // The parameters are just defaults I think
-module.exports.newAccount = async function (acount_number = 0, owner = "TheToddLuci0", bal = 666.0, pin = 1234) {
+module.exports.newAccount = async function (accountNum = 0, owner = "TheToddLuci0", bal = 666.0, pin = 1234) {
     checkConnection();
-    let key = new Aerospike.Key("minimoira", "accounts", acount_number);
+    let key = new Aerospike.Key("minimoira", "accounts", accountNum);
     const policy = new Aerospike.WritePolicy({
-        exists: Aerospike.policy.exists.CREATE_ONLY // Not sure about this
+        exists: Aerospike.policy.exists.UPDATE // Not sure about this
     });
     try {
         await client.put(key, {
             pin: pin,
-            account_number: acount_number,
+            account_number: accountNum,
             owner: owner,
             amount: new Aerospike.Double(bal)
         }, policy);
     } catch (e) {
-        throw e;
+        global.logger.info(`(aerospike(newAccount)): exception caught while putting a new account in the db: ${e}`);
+        //throw e;
     }
 
     // I hope this doesn't go wrong, some people could potentially be very unhappy
-    request.post({
+     request.post({
         baseUrl: settings.P9_2_json.ip + settings.P9_2_json.port.toString(),
         uri: '/acct.cgi',
         json: true,
@@ -226,7 +227,7 @@ module.exports.newAccount = async function (acount_number = 0, owner = "TheToddL
             name: owner,
             pin: pin,
             balance: bal,
-            acct: acount_number
+            acct: accountNum
         }
     })
 };
